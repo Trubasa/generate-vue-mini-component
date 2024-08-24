@@ -1,26 +1,63 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import * as fs from "fs";
+import * as path from "path";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  console.log("Congratulations, your extension is now active!");
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "virable-prompter-2" is now active!');
+  let disposable = vscode.commands.registerCommand(
+    "extension.createMiniProgramComponent",
+    async (uri: vscode.Uri) => {
+      const input = await vscode.window.showInputBox({
+        prompt: "请输入小程序 component 的名称",
+        placeHolder: "component-name",
+      });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('virable-prompter-2.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from virable-prompter-2!');
-	});
+      if (!input) {
+        vscode.window.showErrorMessage("未输入名称");
+        return;
+      }
 
-	context.subscriptions.push(disposable);
+      const componentDir = path.join(uri.fsPath, input);
+      if (fs.existsSync(componentDir)) {
+        vscode.window.showErrorMessage("目录已存在");
+        return;
+      }
+
+      try {
+        // 创建目录
+        fs.mkdirSync(componentDir);
+
+        const templatesDir = path.join(__dirname, "templates");
+
+        // 创建文件
+        const filesToCreate = [
+          { ext: "ts", templateFile: "component.ts" },
+          { ext: "html", templateFile: "component.html" },
+          { ext: "css", templateFile: "component.css" },
+          { ext: "json", templateFile: "component.json" },
+        ];
+
+        filesToCreate.forEach((file) => {
+          const filePath = path.join(componentDir, `${input}.${file.ext}`);
+          const templateContent = fs.readFileSync(
+            path.join(templatesDir, file.templateFile),
+            "utf8"
+          );
+          const fileContent = templateContent.replace(/componentName/g, input);
+          fs.writeFileSync(filePath, fileContent, { encoding: "utf8" });
+        });
+
+        vscode.window.showInformationMessage(
+          `成功创建小程序 component: ${input}`
+        );
+      } catch (err) {
+        vscode.window.showErrorMessage(`创建小程序 component 失败: ${err}`);
+      }
+    }
+  );
+
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
