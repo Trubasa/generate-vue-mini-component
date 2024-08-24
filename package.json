@@ -1,12 +1,20 @@
 {
-  "name": "your-extension-name",
-  "displayName": "Your Extension Display Name",
-  "description": "Your Extension Description",
+  "name": "generate-vue-mini-component",
+  "displayName": "生成vue-mini的component",
+  "description": "生成vue-mini的component",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.75.0"
   },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Trubasa/generate-vue-mini-component"
+  },
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:extension.createMiniProgramComponent"
+  ],
   "contributes": {
     "commands": [
       {
