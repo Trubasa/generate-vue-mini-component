@@ -33,7 +33,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
+    "vscode:prepublish": "tsc -p ./ && npm run copy-templates",
     "compile": "tsc -p ./ && npm run copy-templates",
     "watch": "tsc -watch -p ./",
     "copy-templates": "npx copyfiles -u 1 src/templates/* out/"
