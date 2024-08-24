@@ -24,24 +24,38 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
+      // 获取工作区根路径
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      if (!workspaceFolders) {
+        vscode.window.showErrorMessage("请打开一个工作区进行操作");
+        return;
+      }
+
+      const workspaceRoot = workspaceFolders[0].uri.fsPath;
+      const templatesDir = path.join(
+        workspaceRoot,
+        "extensionVueMiniComponentTemplates"
+      );
+
+      // 检查模板目录是否存在
+      if (!fs.existsSync(templatesDir)) {
+        vscode.window.showErrorMessage(`模板目录不存在: ${templatesDir}`);
+        return;
+      }
+
       try {
         // 创建目录
         fs.mkdirSync(componentDir);
 
-        const templatesDir = path.join(__dirname, "templates");
+        // 获取模板文件列表
+        const templateFiles = fs.readdirSync(templatesDir);
 
         // 创建文件
-        const filesToCreate = [
-          { ext: "ts", templateFile: "component.ts" },
-          { ext: "html", templateFile: "component.html" },
-          { ext: "css", templateFile: "component.css" },
-          { ext: "json", templateFile: "component.json" },
-        ];
-
-        filesToCreate.forEach((file) => {
-          const filePath = path.join(componentDir, `${input}.${file.ext}`);
+        templateFiles.forEach((templateFile) => {
+          const ext = path.extname(templateFile);
+          const filePath = path.join(componentDir, `${input}${ext}`);
           const templateContent = fs.readFileSync(
-            path.join(templatesDir, file.templateFile),
+            path.join(templatesDir, templateFile),
             "utf8"
           );
           const fileContent = templateContent.replace(/componentName/g, input);

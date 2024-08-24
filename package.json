@@ -22,6 +22,16 @@
         "title": "创建小程序 component"
       }
     ],
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "extensionVueMiniComponent.templateDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "指定模板文件的目录。如果未指定，将使用默认的 extensionVueMiniComponentTemplates 目录。"
+        }
+      }
+    },
     "menus": {
       "explorer/context": [
         {
